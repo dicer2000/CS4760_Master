@@ -13,16 +13,18 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include "bin_adder.h"
 
 // Forward declarations
 static void show_usage(std::string);
-void printEnvironment();
 
 // Main - expecting arguments
 int main(int argc, char* argv[])
 {
     // Argument processing
     int opt;
+
+    first_space::testFunc();
 
     // Go through each parameter entered and
     // prepare for processing

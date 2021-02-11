@@ -1,0 +1,2 @@
+master.o: master.cpp bin_adder.h
+bin_adder.o: bin_adder.cpp
