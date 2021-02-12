@@ -5,7 +5,16 @@
 using namespace std;
 
 
-void first_space::testFunc()
+// Main - expecting arguments
+int main(int argc, char* argv[])
+{
+    // Argument processing
+    int opt;
+
+    return 0;
+}
+
+void testFunc()
 {
 
     cout << "Some test Func" << endl;

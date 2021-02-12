@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     // Argument processing
     int opt;
 
-    first_space::testFunc();
+    testFunc();
 
     // Go through each parameter entered and
     // prepare for processing
