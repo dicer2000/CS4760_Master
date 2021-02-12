@@ -1,79 +1,122 @@
 /********************************************
- * doenv - A env derivation program
+ * master - Processes and shared memory
+ * This file is for the master functionality of the
+ * application.  It kicks off from the main file.
+ * 
  * Brett Huffman
  * CMP SCI 4760 - Project 1
  * Due Feb 9, 2021
- * Main CPP file for project
+ * Master CPP file for project
  ********************************************/
 #include <iostream>
 #include <string.h>
 #include <vector>
+#include <fstream>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include "master.h"
 #include "bin_adder.h"
 
-// Forward declarations
-static void show_usage(std::string);
+// Static process counter => Never > 20
+const int MAX_PROCESSES = 20;
+static int ProcessCount = 0;
 
-// Main - expecting arguments
-int main(int argc, char* argv[])
+using namespace std;
+
+struct addItem {
+    int AddItemIndex;
+    int ItemValue;
+};
+
+// Item Variables
+vector<addItem> vecItemArray;
+
+// ProcessMaster
+// The processMaster function to process data from the given input file.
+int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, string InputDataFile)
 {
-    // Argument processing
-    int opt;
-
-    testFunc();
-
-    // Go through each parameter entered and
-    // prepare for processing
-    while ((opt = getopt(argc, argv, "hst")) != -1) {
-        switch (opt) {
-            case 'h':
-                show_usage(argv[0]);
-                return 0;
-            case 's':
-                break;
-            case 't':
-                break;
-            case '?': // Unknown arguement                
-                if (isprint (optopt))
-                {
-                    errno = EINVAL;
-                    perror("Unknown option");
-//                    fprintf (stderr, "Unknown option `-%c'.\n", optopt);
-                }
-                else
-                {
-                    errno = EINVAL;
-                    perror("Unknown option character");
-                }
+    // Read in data file
+    string line;
+    ifstream processFile(InputDataFile);
+    // Open the file and read it in
+    if (processFile.is_open())
+    {
+        // Read each line
+        while (getline(processFile,line))
+        {
+            // Error check
+            try
+            {
+                int i = std::stoi(line);
+                addItem ai;
+                ai.ItemValue = i;
+                ai.AddItemIndex = -1;
+                // We've got a good value
+                // Push it to the vector array
+                vecItemArray.push_back(ai);
+            }
+            catch (std::invalid_argument const &e)
+            {
+                processFile.close();
+                perror("Bad data file value");
                 return -1;
-            default:    // An bad input parameter was entered
-                // Show error because a bad option was found
-                perror ("master: Error: Illegal option found");
-                show_usage(argv[0]);
+            }
+            catch (std::out_of_range const &e)
+            {
+                processFile.close();
+                perror("Bad data file value: Integer overflow");
                 return -1;
+            }
+
         }
+        processFile.close();
+    }
+    else
+    {
+        // Error - cant open file
+        errno = ENOENT;
+        perror(InputDataFile.c_str());
+        return -1;
     }
 
+    // Check that the input file is a power of 2.  Kind of a
+    // wizzy way of doing it... but I like it.  When it's done
+    // it should tell me what power of 2 it is
+    int index = vecItemArray.size();
+    int targetlevel = 0;
+    // Could do this with log(), but then I've got
+    // to use floats. :(
+    while (index >>= 1) ++targetlevel;
+
+    // While there is less than a full power of 2
+    // Fill in zeros
+    if(pow(2, targetlevel) < vecItemArray.size())
+    {
+        targetlevel++;
+        do
+        {
+            addItem ai;
+            ai.ItemValue = 0;   // Per directions, add 0
+            ai.AddItemIndex = -1;
+            // We've got a good value
+            // Push it to the vector array
+            vecItemArray.push_back(ai);
+        }
+        while(pow(2, targetlevel) < vecItemArray.size());
+    }
+
+    // If this was successful, we are finally ready to process
+    // the file adds with our child processes.
+    // At this point, I know the array size needed to handle
+    // processing this entire problem: 2^(targetlevel+1)-1
+    // For instance, 2^3 items is: 2^4-1 = 15 array items
+
+
+
+
+    // Success!
     return 0;
-}
-
-
-// Handle errors in input arguments by showing usage screen
-static void show_usage(std::string name)
-{
-    std::cerr << std::endl
-              << name << " - master app by Brett Huffman for CMP SCI 4760" << std::endl
-              << std::endl
-              << "Usage:\t" << name << " [-h]" << std::endl
-              << "\t" << name << " [-i] [var1=value] [var2=value] [...] {command1 [;command2] [;...]}" << std::endl
-              << "Options:" << std::endl
-              << "  -h        Describe how the project should be run and then, terminate." << std::endl
-              << "  -s x      Indicate the number of children allowed to exist in the system at the same time. (Default 20)" << std::endl
-              << "  -t time   The time in seconds after which the process will terminate, even if it has not finished. (Default 100)"
-              << "  datafile  Input file containing one integer on each line."
-              << std::endl << std::endl;
 }

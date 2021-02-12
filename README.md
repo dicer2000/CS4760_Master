@@ -29,7 +29,7 @@ it saved.
 git clone https://github.com/dicer2000/CS4760_Master.git
 ```
 ## Compile
-To compile the mydu application, simply run the make command:
+To compile the master application, simply run the make command:
 ```
 make
 ```
@@ -38,9 +38,13 @@ To run the program, use the master command.  You can use any of the attributes l
 
 ## Problems / Issues
 
+My initial problem was in understanding how the fork really worked.  I think its interesting that the forked process takes off from the spot it's forked.  I thought it would be from the very start of the program.  Once I go that, I was able to understand at least how the processing was going to happen.
+
+
 
 ## Work Log
 
 - 2/10/2021 - Created project, Makefile, this readme file and got it all to compile
+- 2/11/2021 - Created outline of project, started work on main, master processes
 
 *©2021 Brett W. Huffman*
