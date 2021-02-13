@@ -18,7 +18,6 @@
 #include <unistd.h>
 #include <errno.h>
 #include "master.h"
-#include "bin_adder.h"
 
 // Static process counter => Never > 20
 const int MAX_PROCESSES = 20;

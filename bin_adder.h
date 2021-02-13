@@ -1,3 +1,5 @@
+#include <iostream>
 
+using namespace std;
 
-    void testFunc();
+void testFunc();
