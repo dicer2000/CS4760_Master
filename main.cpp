@@ -28,6 +28,15 @@ const int MaxNumberOfSeconds = 100;
 // Forward declarations
 static void show_usage(std::string);
 
+namespace F1
+{
+    int main(int argc, char * argv[])
+    {
+        // ...
+        return 0;
+    }
+}
+
 // Main - expecting arguments
 int main(int argc, char* argv[])
 {

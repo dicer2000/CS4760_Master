@@ -113,10 +113,16 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
     // At this point, I know the array size needed to handle
     // processing this entire problem: 2^(targetlevel+1)-1
     // For instance, 2^3 items is: 2^4-1 = 15 array items
+    /*
+    const int arrItemCount = pow(2, targetlevel+1) - 1;
+    int arrItemCount[arrItemCount] = { 0 };
 
-
-
-
+    // Fill array
+    for(int i=0;i< vecItemArray.size(); i++)
+    {
+//        arrItemCount[i]    vecItemArray
+    }
+    */
     // Success!
     return 0;
 }
