@@ -2,11 +2,9 @@
 # (c)2021 Brett Huffman
 # To use, just change the next line to the name of
 # the application
-appname := master bin_adder
 
-CXX := g++
-CXXFLAGS := -std=c++11
-
+# Version 1
+appname := master
 srcfiles := $(shell find . -name "*.cpp")
 objects  := $(patsubst %.cpp, %.o, $(srcfiles))
 
