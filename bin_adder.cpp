@@ -10,16 +10,19 @@
  ********************************************/
 #include <iostream>
 #include "bin_adder.h"
+#include <unistd.h>
 
 using namespace std;
 
-int main()
+int main(int argc, char* argv[])
 {
-    return 0;
+    cout << "got here" << endl;
+    testFunc();
+    return EXIT_SUCCESS;
 }
 
 void testFunc()
 {
-
     cout << "Some test Func" << endl;
+    sleep(2);
 }

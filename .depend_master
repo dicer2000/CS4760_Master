@@ -1,2 +1,0 @@
-master_main.o: master_main.cpp master.h
-master.o: master.cpp master.h

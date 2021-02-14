@@ -33,7 +33,7 @@ namespace F1
     int main(int argc, char * argv[])
     {
         // ...
-        return 0;
+        return EXIT_SUCCESS;
     }
 }
 
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
         switch (opt) {
             case 'h':
                 show_usage(argv[0]);
-                return 0;
+                return EXIT_SUCCESS;
             case 's':
                 nNumberOfChildren = atoi(optarg);
                 break;
@@ -70,12 +70,12 @@ int main(int argc, char* argv[])
                     errno = EINVAL;
                     perror("Unknown option character");
                 }
-                return -1;
+                return EXIT_FAILURE;
             default:    // An bad input parameter was entered
                 // Show error because a bad option was found
                 perror ("master: Error: Illegal option found");
                 show_usage(argv[0]);
-                return -1;
+                return EXIT_FAILURE;
         }
     }
 
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
     // Otherwise, an error -- must pass a filename
     perror ("Error: You must enter a data file to process");
     show_usage(argv[0]);
-    return -1;
+    return EXIT_FAILURE;
 }
 
 
