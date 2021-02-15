@@ -19,13 +19,25 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-/*
-int shmid = shmget(key, 0, ...);
-shmctl(shmid, IPC_STAT, &shm_id);
-size_t realSize = shm_id.shm_segsz;
-shmid = shmget(key, realSize, ...);
-void * p = shmat(shmid);
-*/
+
+    // Argument processing
+    // If any error happens, show error statement and
+    // return error immediately
+    try
+    {
+        if(argc!=3) throw std::runtime_error("Incorrect Arguements");
+        int index = optind;
+        int nFirstNumber = atoi(argv[index]);
+        int nSecondNumber = atoi(argv[index+1]);
+    }
+    catch(const std::exception& e)
+    {
+        errno = EINVAL;
+        perror(e.what());
+        // General error
+        show_usage(argv[0]);
+        exit(EXIT_FAILURE);
+    }
 
     // Allocate the shared memory
     // And get ready for read/write
@@ -33,27 +45,20 @@ void * p = shmat(shmid);
         perror("ftok");
         exit(EXIT_FAILURE);
     }
-    // First get the size of the memory instantiated (hopefully)
-//    struct shmid_ds buf;
-//    shmctl(int shmid, int cmd, struct shmid_ds *buf);
-//    shmctl(buf, IPC_STAT, &buf);
-//    int length = (int) buf.shm_segsz / sizeof(int);
-
-    // allocate a shared memory segment with size of struct array
-//    int memSize = sizeof(AddItem) * arrItemCount;
-    // Get the size of the array
+    // Get a reference to the shared memory, if available
     shm_id = shmget(key, 0, 0);
     if (shm_id == -1) {
         perror("shmget1: ");
         exit(EXIT_FAILURE);
     }
 
+    // Read the memory size and calculate the array size
     struct shmid_ds shmid_ds;
     shmctl(shm_id, IPC_STAT, &shmid_ds);
     size_t realSize = shmid_ds.shm_segsz;
     int length = (int) shmid_ds.shm_segsz / sizeof(AddItem);
 
-    // Now we have the size - actually allocate
+    // Now we have the size - actually setup with shmget
     shm_id = shmget(key, realSize, 0);
     if (shm_id == -1) {
         perror("shmget2: ");
@@ -67,15 +72,25 @@ void * p = shmat(shmid);
         exit(EXIT_FAILURE);
     }
 
-
-
     cout << "Items: " << length << endl;
-    testFunc();
+
+    // Determine the two numbers to add and do it
+
+
     return EXIT_SUCCESS;
 }
 
-void testFunc()
+// Handle errors in input arguments by showing usage screen
+static void show_usage(std::string name)
 {
-    cout << "Some test Func" << endl;
-    sleep(2);
+    std::cerr << std::endl
+              << name << " - bin_adder app by Brett Huffman for CMP SCI 4760" << std::endl
+              << std::endl
+              << "Usage:\t" << name << " xx yy" << std::endl
+              << "Parameters:" << std::endl
+              << "  xx   The index of the first number to add in shared memory" << std::endl
+              << "  yy   The depth of the tree in shared memory" << std::endl
+              << "Note that since this program uses shared memory, it will " << std::endl
+              << "only work when called by the master program." << std::endl
+              << std::endl << std::endl;
 }

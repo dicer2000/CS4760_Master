@@ -63,7 +63,6 @@ int main(int argc, char* argv[])
                 {
                     errno = EINVAL;
                     perror("Unknown option");
-//                    fprintf (stderr, "Unknown option `-%c'.\n", optopt);
                 }
                 else
                 {
@@ -107,9 +106,9 @@ static void show_usage(std::string name)
               << name << " - master app by Brett Huffman for CMP SCI 4760" << std::endl
               << std::endl
               << "Usage:\t" << name << " [-h]" << std::endl
-              << "\t" << name << " [-i] [var1=value] [var2=value] [...] {command1 [;command2] [;...]}" << std::endl
+              << "\t" << name << " [-h] [-s i] [-t time] datafile" << std::endl
               << "Options:" << std::endl
-              << "  -h        Describe how the project should be run and then, terminate." << std::endl
+              << "  -h        This help information is shown" << std::endl
               << "  -s x      Indicate the number of children allowed to exist in the system at the same time. (Default 20)" << std::endl
               << "  -t time   The time in seconds after which the process will terminate, even if it has not finished. (Default 100)"
               << "  datafile  Input file containing one integer on each line."

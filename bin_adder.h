@@ -2,4 +2,5 @@
 
 using namespace std;
 
-void testFunc();
+// bin_adder Function Declarations
+static void show_usage(std::string);
