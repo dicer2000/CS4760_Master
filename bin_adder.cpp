@@ -44,7 +44,7 @@ void * p = shmat(shmid);
     // Get the size of the array
     shm_id = shmget(key, 0, 0);
     if (shm_id == -1) {
-        perror("shmget: ");
+        perror("shmget1: ");
         exit(EXIT_FAILURE);
     }
 
@@ -54,9 +54,9 @@ void * p = shmat(shmid);
     int length = (int) shmid_ds.shm_segsz / sizeof(AddItem);
 
     // Now we have the size - actually allocate
-    shm_id = shmget(key, realSize, IPC_CREAT | IPC_EXCL | 0600);
+    shm_id = shmget(key, realSize, 0);
     if (shm_id == -1) {
-        perror("shmget: ");
+        perror("shmget2: ");
         exit(EXIT_FAILURE);
     }
 

@@ -111,7 +111,7 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
     }
     // allocate a shared memory segment with size of struct array
     int memSize = sizeof(AddItem) * arrItemCount;
-    shm_id = shmget(key, memSize, IPC_CREAT | IPC_EXCL | 0600);
+    shm_id = shmget(key, memSize, IPC_CREAT | IPC_EXCL | 0660);
     if (shm_id == -1) {
         perror("shmget: ");
         exit(EXIT_FAILURE);
