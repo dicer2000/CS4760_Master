@@ -11,8 +11,9 @@
  * Master CPP file for project
  ********************************************/
 
-#include <sys/shm.h>
+#include <sys/types.h>
 #include <sys/ipc.h>
+#include <sys/shm.h>
 
 // Semiphore union
 union semun {
@@ -35,3 +36,7 @@ struct AddItem {
 
 key_t key = 0;  // Shared key
 int shm_id; // Shared Mem ident
+char* shm_addr;
+
+const char* HostProcess = "./master";
+const char* ChildProcess = "./bin_adder";

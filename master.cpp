@@ -24,7 +24,6 @@
 // Static process counter => Never > 20
 const int MAX_PROCESSES = 20;
 static int ProcessCount = 0;
-const char* ChildProcess = "./bin_adder";
 
 using namespace std;
 
@@ -32,7 +31,6 @@ using namespace std;
 vector<int> vecItemArray;
 int* addItem_num;
 struct AddItem* addItems;
-char* shm_addr;
 
 // ProcessMaster
 // The processMaster function to process data from the given input file.
@@ -107,7 +105,7 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
 
     // Allocate the shared memory
     // And get ready for read/write
-    if ((key = ftok("./master", 100)) == -1) {
+    if ((key = ftok(HostProcess, 100)) == -1) {
         perror("ftok");
         exit(EXIT_FAILURE);
     }
