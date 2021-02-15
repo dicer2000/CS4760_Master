@@ -11,6 +11,7 @@
 #include <iostream>
 #include "bin_adder.h"
 #include <unistd.h>
+#include "sharedStructures.h"
 
 using namespace std;
 
