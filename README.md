@@ -40,11 +40,34 @@ To run the program, use the master command.  You can use any of the attributes l
 
 My initial problem was in understanding how the fork really worked.  I think its interesting that the forked process takes off from the spot it's forked.  I thought it would be from the very start of the program.  Once I go that, I was able to understand at least how the processing was going to happen.
 
+My biggest problem, so far, has been in determining the size of the shared memory in the bin_adder program. Once you figure out the formula, through a series of calls to shmctl, shmget, & shmadd, you are able to get the size of the array, cast it to the correct type,  and finally do the addition.  It was no small feat as the documentation is lacking.
+
+The textbook finally helped me solve the problem with this example on pg 619:
+```
+if ((id = shmget(IPC_PRIVATE, sizeof(int), PERM)) == -1) {
+ perror("Failed to create shared memory segment");
+ return 1;
+ }
+ if ((sharedtotal = (int *)shmat(id, NULL, 0)) == (void *)-1) {
+ perror("Failed to attach shared memory segment");
+ if (shmctl(id, IPC_RMID, NULL) == -1)
+ perror("Failed to remove memory segment");
+ return 1;
+ }
+ if ((childpid = fork()) == -1) {
+ perror("Failed to create child process");
+ if (detachandremove(id, sharedtotal) == -1)
+ perror("Failed to destroy shared memory segment");
+ return 1;
+ }
+```
 
 
 ## Work Log
 
 - 2/10/2021 - Created project, Makefile, this readme file and got it all to compile
 - 2/11/2021 - Created outline of project, started work on main, master processes
+- 2/13/2021 - Finished rough master, memory allocation with shm functions
+- 2/14/2021 - Finished logic to send requests to bin_adder(), added bin_adder code to determine size of shared memory.
 
 *©2021 Brett W. Huffman*
