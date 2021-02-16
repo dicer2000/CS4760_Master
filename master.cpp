@@ -134,7 +134,8 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
         addItems[i].complete = false;
         // Setup every other item as 
         // ready-to-process (Leaf items of tree)
-        addItems[i].readyToProcess = (i%2==0);
+        addItems[i].readyToProcess = true; //(i%2==0);
+        addItems[i].nodeDepth = -1;
     }
     printf("parent process, pid = %u\n",getpid());  
 
@@ -146,7 +147,6 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
     int arrayIndex = 0;
     pid_t cpid, w;
     int wstatus;
-
 
     // Set a variable to keep track of target level
     int nDepth = targetlevel;
@@ -161,6 +161,8 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
         // then by every node in the array
         for(int i=0;i<nDepth;i++)
         {
+            cout << endl;
+
             for(int j=0;j<arrItemCount;j+=pow(2, i+1))
             {
                 // j will always be the nodes we need to
@@ -169,18 +171,28 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
                 int nCheck1 = j;
                 int nCheck2 = pow(2, i) + j;
 
-                if(addItems[nCheck1].readyToProcess && addItems[nCheck2].readyToProcess)
+                // If the current nodes looked at are ready to process and
+                // haven't already been processed for this depth, process them
+                if(addItems[nCheck1].nodeDepth < i &&
+                    addItems[nCheck1].readyToProcess && addItems[nCheck2].readyToProcess)
                 {
                     // Set as processing
                     addItems[nCheck1].readyToProcess = addItems[nCheck2].readyToProcess = false;
                     // Set the depth of it's last process run
-                    addItems[nCheck1].nodeDepth = addItems[nCheck1].nodeDepth = nDepth-i;
+                    addItems[nCheck1].nodeDepth = addItems[nCheck2].nodeDepth = i; //nDepth-i;
                     // Fork and store pid in each node
-                    int pid = forkProcess(addItems[nCheck1].itemValue, nDepth-3);
+                    int pid = forkProcess(nCheck1, i);
                     addItems[nCheck1].pidAssigned = addItems[nCheck2].pidAssigned = pid;
                 }
             }
         }
+
+        // Print
+            for(int j=0; j < arrItemCount; j++)
+            {
+                cout << addItems[j].itemValue << "\t";
+            }
+            cout << endl;
 
         // Wait for any PID
         do {
@@ -223,7 +235,7 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
         } while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus));
         
 
-sleep(2);
+//sleep(2);
     }
 
     // Dedetach shared memory segment from process's address space

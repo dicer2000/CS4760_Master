@@ -19,6 +19,10 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+    // Variables to be used
+    int nFirstNumberIndex = 0;
+    int nSecondNumberIndex = 0;
+    int nDepth = 0;
 
     // Argument processing
     // If any error happens, show error statement and
@@ -27,8 +31,8 @@ int main(int argc, char* argv[])
     {
         if(argc!=3) throw std::runtime_error("Incorrect Arguements");
         int index = optind;
-        int nFirstNumber = atoi(argv[index]);
-        int nSecondNumber = atoi(argv[index+1]);
+        nFirstNumberIndex = atoi(argv[index]);
+        nDepth = atoi(argv[index+1]);
     }
     catch(const std::exception& e)
     {
@@ -38,6 +42,10 @@ int main(int argc, char* argv[])
         show_usage(argv[0]);
         exit(EXIT_FAILURE);
     }
+
+    // Calculate the second index
+    nSecondNumberIndex = pow(2, nDepth) + nFirstNumberIndex;
+
 
     // Allocate the shared memory
     // And get ready for read/write
@@ -72,10 +80,25 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
 
+    // Cast it to our structure array
+    int* addItem_num = (int*) shm_addr;
+    *addItem_num = 0;
+    struct AddItem* addItems = (struct AddItem*) (shm_addr+sizeof(int));
+
+    // Check that everything is okay before we go any further
+    if(nFirstNumberIndex > length || nSecondNumberIndex > length)
+    {
+        // Error found
+        perror("bin_adder: ");
+        exit(EXIT_FAILURE);
+    }
+
+    // Determine the two numbers to add and store it in the first position
+    addItems[nFirstNumberIndex].itemValue = 
+        addItems[nFirstNumberIndex].itemValue + addItems[nSecondNumberIndex].itemValue;
+
     cout << "Items: " << length << endl;
-
-    // Determine the two numbers to add and do it
-
+    cout << "Total: " << addItems[nFirstNumberIndex].itemValue;
 
     return EXIT_SUCCESS;
 }
