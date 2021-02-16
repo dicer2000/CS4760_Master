@@ -69,5 +69,6 @@ if ((id = shmget(IPC_PRIVATE, sizeof(int), PERM)) == -1) {
 - 2/11/2021 - Created outline of project, started work on main, master processes
 - 2/13/2021 - Finished rough master, memory allocation with shm functions
 - 2/14/2021 - Finished logic to send requests to bin_adder(), added bin_adder code to determine size of shared memory.
+- 2/15/2021 - Debugging functionality
 
 *©2021 Brett W. Huffman*
