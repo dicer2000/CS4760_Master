@@ -180,6 +180,8 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
                     addItems[nCheck1].readyToProcess = addItems[nCheck2].readyToProcess = false;
                     // Set the depth of it's last process run
                     addItems[nCheck1].nodeDepth = addItems[nCheck2].nodeDepth = i; //nDepth-i;
+                    
+                    cout << "Sending: " << nCheck1 << " " << i << endl;
                     // Fork and store pid in each node
                     int pid = forkProcess(nCheck1, i);
                     addItems[nCheck1].pidAssigned = addItems[nCheck2].pidAssigned = pid;
@@ -268,7 +270,6 @@ int forkProcess(int nItemStart, int nDepth)
         // Child process here - Assign out it's work
         if(pid == 0)
         {
-            cout << "I am child" << endl;
             // Get strings from the int params
             string strItemStart = format("%d", nItemStart);
             string strDepth = format("%d", nDepth);

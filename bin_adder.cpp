@@ -19,6 +19,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+    
     // Variables to be used
     int nFirstNumberIndex = 0;
     int nSecondNumberIndex = 0;
@@ -27,12 +28,16 @@ int main(int argc, char* argv[])
     // Argument processing
     // If any error happens, show error statement and
     // return error immediately
+
+//    for(int i=0;i<argc;i++)
+//        cout << argv[i] << "\t" << endl;
+
     try
     {
-        if(argc!=3) throw std::runtime_error("Incorrect Arguements");
+        if(argc!=2) throw std::runtime_error("Incorrect Arguements");
         int index = optind;
-        nFirstNumberIndex = atoi(argv[index]);
-        nDepth = atoi(argv[index+1]);
+        nFirstNumberIndex = atoi(argv[0]);
+        nDepth = atoi(argv[1]);
     }
     catch(const std::exception& e)
     {
@@ -46,6 +51,7 @@ int main(int argc, char* argv[])
     // Calculate the second index
     nSecondNumberIndex = pow(2, nDepth) + nFirstNumberIndex;
 
+    cout << "Adder: " << nFirstNumberIndex << " " << nSecondNumberIndex << " d " << nDepth << endl;
 
     // Allocate the shared memory
     // And get ready for read/write
