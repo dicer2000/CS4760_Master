@@ -13,12 +13,18 @@
 #include <unistd.h>
 #include "sharedStructures.h"
 
-
+// SIGQUIT handling
+volatile sig_atomic_t sigQuitFlag = 0;
+void sigQuitHandler(int sig){ // can be called asynchronously
+  sigQuitFlag = 1; // set flag
+}
 
 using namespace std;
 
 int main(int argc, char* argv[])
 {
+    // Register SIGQUIT handling
+    signal(SIGINT, sigQuitHandler);
     
     // Variables to be used
     int nFirstNumberIndex = 0;
@@ -28,10 +34,6 @@ int main(int argc, char* argv[])
     // Argument processing
     // If any error happens, show error statement and
     // return error immediately
-
-//    for(int i=0;i<argc;i++)
-//        cout << argv[i] << "\t" << endl;
-
     try
     {
         if(argc!=2) throw std::runtime_error("Incorrect Arguements");
@@ -51,7 +53,8 @@ int main(int argc, char* argv[])
     // Calculate the second index
     nSecondNumberIndex = pow(2, nDepth) + nFirstNumberIndex;
 
-    cout << "Adder: " << nFirstNumberIndex << " " << nSecondNumberIndex << " d " << nDepth << endl;
+    pid_t childPid = getpid();
+    cout << "Adder PID " << childPid << ": " << nFirstNumberIndex << " " << nDepth << endl;
 
     // Allocate the shared memory
     // And get ready for read/write
@@ -103,8 +106,13 @@ int main(int argc, char* argv[])
     addItems[nFirstNumberIndex].itemValue = 
         addItems[nFirstNumberIndex].itemValue + addItems[nSecondNumberIndex].itemValue;
 
-    cout << "Items: " << length << endl;
-    cout << "Total: " << addItems[nFirstNumberIndex].itemValue;
+//    cout << "Total: " << addItems[nFirstNumberIndex].itemValue << endl;
+
+    // Start Time for time Analysis
+    time_t secondsFinish = time(NULL) + 4;   // Finish time
+
+    // Loop until a SIGQUIT happens or we reach Finish Time
+    while(!sigQuitFlag && secondsFinish > time(NULL)) ;
 
     return EXIT_SUCCESS;
 }

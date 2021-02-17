@@ -21,8 +21,8 @@
 #include "master.h"
 #include "sharedStructures.h"
 
-// Static process counter => Never > 20
-const int MAX_PROCESSES = 20;
+// Static process counter => Never > 20 (1 Parent + 19 Children)
+const int MAX_PROCESSES = 19;
 static int ProcessCount = 0;
 
 using namespace std;
@@ -32,10 +32,22 @@ vector<int> vecItemArray;
 int* addItem_num;
 struct AddItem* addItems;
 
+// SIGINT handling
+volatile sig_atomic_t sigIntFlag = 0;
+void sigintHandler(int sig){ // can be called asynchronously
+  sigIntFlag = 1; // set flag
+}
+
 // ProcessMaster
 // The processMaster function to process data from the given input file.
 int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, string InputDataFile)
 {
+    // Register SIGINT handling
+    signal(SIGINT, sigintHandler);
+
+    // Start Time for time Analysis
+    time_t secondsStart;
+
     // Read in data file
     string line;
     ifstream processFile(InputDataFile);
@@ -76,6 +88,9 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
         perror(InputDataFile.c_str());
         return EXIT_FAILURE;
     }
+    // Get the time in seconds for our process to make
+    // sure we don't exceed the max amount of processing time
+    secondsStart = time(NULL);   // Start time
 
     // Check that the input file is a power of 2.  Kind of a
     // wizzy way of doing it... but I like it.  When it's done
@@ -137,7 +152,6 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
         addItems[i].readyToProcess = true; //(i%2==0);
         addItems[i].nodeDepth = -1;
     }
-    printf("parent process, pid = %u\n",getpid());  
 
     // Start Processing with bin_adder xx yy
     // Where xx is start of processing index and yy is depth.
@@ -159,58 +173,90 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
 
         // Search for an "Ready" node first by depth
         // then by every node in the array
-        for(int i=0;i<nDepth;i++)
+        // Only do this if we are no Stop Flag, no time to terminate,
+        // not at Max Processing count, and not at max children allowed
+        if(!sigIntFlag && !((time(NULL)-secondsStart) > timeInSecondsToTerminate)
+            && ProcessCount < numberOfChildrenAllowed && ProcessCount < MAX_PROCESSES)
         {
-            cout << endl;
-
-            for(int j=0;j<arrItemCount;j+=pow(2, i+1))
+            for(int i=0;i<nDepth;i++)
             {
-                // j will always be the nodes we need to
-                // check.  If it is "Ready", check it's 
-                // partner.  If it's "Ready" too => send to bin_adder
-                int nCheck1 = j;
-                int nCheck2 = pow(2, i) + j;
-
-                // If the current nodes looked at are ready to process and
-                // haven't already been processed for this depth, process them
-                if(addItems[nCheck1].nodeDepth < i &&
-                    addItems[nCheck1].readyToProcess && addItems[nCheck2].readyToProcess)
+                for(int j=0;j<arrItemCount;j+=pow(2, i+1))
                 {
-                    // Set as processing
-                    addItems[nCheck1].readyToProcess = addItems[nCheck2].readyToProcess = false;
-                    // Set the depth of it's last process run
-                    addItems[nCheck1].nodeDepth = addItems[nCheck2].nodeDepth = i; //nDepth-i;
-                    
-                    cout << "Sending: " << nCheck1 << " " << i << endl;
-                    // Fork and store pid in each node
-                    int pid = forkProcess(nCheck1, i);
-                    addItems[nCheck1].pidAssigned = addItems[nCheck2].pidAssigned = pid;
+                    // j will always be the nodes we need to
+                    // check.  If it is "Ready", check it's 
+                    // partner.  If it's "Ready" too => send to bin_adder
+                    int nCheck1 = j;
+                    int nCheck2 = pow(2, i) + j;
+
+                    // If the current nodes looked at are ready to process and
+                    // haven't already been processed for this depth, process them
+                    if(addItems[nCheck1].nodeDepth < i &&
+                        addItems[nCheck1].readyToProcess && addItems[nCheck2].readyToProcess)
+                    {
+                        // Set as processing
+                        addItems[nCheck1].readyToProcess = addItems[nCheck2].readyToProcess = false;
+                        // Set the depth of it's last process run
+                        addItems[nCheck1].nodeDepth = addItems[nCheck2].nodeDepth = i; //nDepth-i;
+                        
+//                        cout << "Sending: " << nCheck1 << " " << i << endl;
+                        // Fork and store pid in each node
+                        int pid = forkProcess(nCheck1, i);
+                        addItems[nCheck1].pidAssigned = addItems[nCheck2].pidAssigned = pid;
+                    }
                 }
             }
         }
 
-        // Print
-            for(int j=0; j < arrItemCount; j++)
-            {
-                cout << addItems[j].itemValue << "\t";
-            }
-            cout << endl;
-
-        // Wait for any PID
+        // Loop through looking for a returning PID
         do {
-            w = waitpid(-1, &wstatus, WUNTRACED | WCONTINUED);
+            // Note :: We use the WNOHANG to call waitpid without blocking
+            // If it returns 0, it does not have a PID waiting
+            w = waitpid(-1, &wstatus, WNOHANG | WUNTRACED | WCONTINUED);
+
+            // Terminate the process if CTRL-C is typed
+            // or if the max time-to-process has been exceeded
+            if(sigIntFlag || (time(NULL)-secondsStart) > timeInSecondsToTerminate)
+            {
+                // Send signal for every child process to terminate
+                for(int i=0;i<arrItemCount;i++)
+                {
+                    // Send signal to close if they are in-process
+                    if(addItems[i].readyToProcess == false)
+                        kill(addItems[i].pidAssigned, SIGQUIT); 
+                }
+
+                // We have notified children to terminate immediately
+                // then let program shutdown naturally -- that way
+                // memory is deallocated correctly
+            }
+
+
+
             if (w == -1) {
-                perror("waitpid");
-                bComplete = true;
-                break;
+//                perror("waitpid");
+                bComplete = true;   // We say true so that we exit out of main
+                break;              // loop and free up all necessary data
 //                exit(EXIT_FAILURE);
             }
 
-            if (WIFEXITED(wstatus)) {
-                printf("exited, status=%d\n", WEXITSTATUS(wstatus));
-                // Success!  We are done processing
+            if (WIFEXITED(wstatus) && w > 0) {
+
+                // Success! Child processed correctly
+        // Debug Print ***************************
+//            for(int j=0; j < arrItemCount; j++)
+//            {
+//                cout << addItems[j].itemValue << "\t";
+//            }
+//            cout << endl;
+        // ****************************************
+
+                cout << w << " Completed: " << time(NULL) << "s " << endl;
+
+                // When the PID that terminates is of 0 depth and it's 0 index
+                // Terminate the entire process => Entire tree has processed
                 if(addItems[0].pidAssigned == w && addItems[0].nodeDepth==nDepth)
                 {
+                    // Print PID Info
                     bComplete = true;
                     break;
                 }
@@ -227,12 +273,12 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
                         }
                     }
                 }
-            } else if (WIFSIGNALED(wstatus)) {
-                printf("killed by signal %d\n", WTERMSIG(wstatus));
-            } else if (WIFSTOPPED(wstatus)) {
-                printf("stopped by signal %d\n", WSTOPSIG(wstatus));
-            } else if (WIFCONTINUED(wstatus)) {
-                printf("continued\n");
+            } else if (WIFSIGNALED(wstatus) && w > 0) {
+                cout << w << " killed by signal " << WTERMSIG(wstatus) << endl;
+            } else if (WIFSTOPPED(wstatus) && w > 0) {
+                cout << w << " stopped by signal " << WTERMSIG(wstatus) << endl;
+            } else if (WIFCONTINUED(wstatus) && w > 0) {
+                continue;
             }
         } while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus));
         
@@ -270,12 +316,16 @@ int forkProcess(int nItemStart, int nDepth)
         // Child process here - Assign out it's work
         if(pid == 0)
         {
+            // Increment our ProcessCount
+            ProcessCount++;
             // Get strings from the int params
             string strItemStart = format("%d", nItemStart);
             string strDepth = format("%d", nDepth);
             // Execute child process
             execl(ChildProcess, strItemStart.c_str(), strDepth.c_str(), NULL);
 
+            // Decrement our ProcessCount
+            ProcessCount--;
             fflush(stdout); // Mostly for debugging -> tty wasn't flushing
             exit(EXIT_SUCCESS);    // Exit from forked process successfully
         }

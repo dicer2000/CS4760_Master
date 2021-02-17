@@ -15,6 +15,8 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <errno.h>
+#include <signal.h>
+#include <time.h>
 
 // Semiphore union
 union semun {

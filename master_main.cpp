@@ -87,6 +87,12 @@ int main(int argc, char* argv[])
     {
         // Get the string to process
         string FileToProcess = argv[index];
+
+        // Output what is going to happen
+        cout << "Master starting: " << endl 
+            << "\t" << nNumberOfChildren << " Max Processes" << endl
+            << "\t" << nNumberOfSeconds  << " Max Seconds" << endl << endl;
+
         // Start the Master process, returning whatever master returns.
         return processMaster(nNumberOfChildren, nNumberOfSeconds, FileToProcess);
     }
