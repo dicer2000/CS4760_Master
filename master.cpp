@@ -147,10 +147,9 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
         addItems[i].itemValue = vecItemArray[i];
         addItems[i].pidAssigned = 0;
         addItems[i].complete = false;
-        // Setup every other item as 
-        // ready-to-process (Leaf items of tree)
         addItems[i].readyToProcess = true; //(i%2==0);
         addItems[i].nodeDepth = -1;
+        addItems[i].itemState = idle;
     }
 
     // Start Processing with bin_adder xx yy
@@ -243,11 +242,9 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
 
                 // Success! Child processed correctly
         // Debug Print ***************************
-//            for(int j=0; j < arrItemCount; j++)
-//            {
-//                cout << addItems[j].itemValue << "\t";
-//            }
-//            cout << endl;
+            for(int j=0; j < arrItemCount; j++)
+                cout << addItems[j].itemValue << "\t";
+            cout << endl;
         // ****************************************
 
                 cout << w << " Completed: " << time(NULL) << "s " << endl;

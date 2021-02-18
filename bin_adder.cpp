@@ -19,12 +19,18 @@ void sigQuitHandler(int sig){ // can be called asynchronously
   sigQuitFlag = 1; // set flag
 }
 
+    // Critical Section Turn Flag
+    extern int turn;
+
 using namespace std;
 
 int main(int argc, char* argv[])
 {
+
     // Register SIGQUIT handling
     signal(SIGINT, sigQuitHandler);
+
+    int turn = 0;   // Used for Critical Section
     
     // Variables to be used
     int nFirstNumberIndex = 0;
@@ -108,11 +114,52 @@ int main(int argc, char* argv[])
 
 //    cout << "Total: " << addItems[nFirstNumberIndex].itemValue << endl;
 
+
+    // Critical Section Handling Routine
+    // Keep the state flag in addItems[nFirstNumberIndex].state
+    
+    int j; // Local to this process
+    do
+    {
+        addItems[nFirstNumberIndex].itemState = want_in; // Raise my flag
+        j = turn; // Set local variable
+        while ( j != nFirstNumberIndex )
+        j = ( addItems[j].itemState != idle ) ? turn : ( j + 1 ) % length;
+
+        // Declare intention to enter critical section
+        addItems[nFirstNumberIndex].itemState = in_cs;
+        // Check that no one else is in critical section
+        for ( j = 0; j < length; j++ )
+            if ( ( j != nFirstNumberIndex ) && ( addItems[j].itemState == in_cs ) )
+        break;
+    } while (!sigQuitFlag && ( j < length ) || 
+        ( turn != nFirstNumberIndex && addItems[turn].itemState != idle ));
+
+        // Assign turn to self and enter critical section
+        turn = nFirstNumberIndex;
+
+//cout << "***Got here " << childPid << endl;
+
     // Start Time for time Analysis
-    time_t secondsFinish = time(NULL) + 4;   // Finish time
+    time_t secondsFinish = time(NULL) + 1;   // Finish time
 
     // Loop until a SIGQUIT happens or we reach Finish Time
-    while(!sigQuitFlag && secondsFinish > time(NULL)) ;
+    while(!sigQuitFlag && secondsFinish > time(NULL))
+    ;
+
+
+
+    // Exit section
+//    j = (turn + 1) % length;
+//    while (addItems[j].itemState == idle)
+//        j = (j + 1) % length;
+    // Assign turn to next waiting process; change own flag to idle
+//    turn = j;
+    addItems[nFirstNumberIndex].itemState = idle;
+
+    
+
+
 
     return EXIT_SUCCESS;
 }

@@ -28,6 +28,9 @@ union semun {
 #endif
 };
 
+// Critical Section Processing
+enum state { idle, want_in, in_cs };
+
 // Shared Memory structure
 struct AddItem {
     bool readyToProcess;    // Ready to Process
@@ -35,6 +38,7 @@ struct AddItem {
     bool complete;          // Completed Process
     int nodeDepth;          // Depth that this node is processing
     int itemValue;          // The actual value
+    state itemState;        // The Critical Secion Flag
 };
 
 key_t key = 0;  // Shared key

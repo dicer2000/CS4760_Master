@@ -61,7 +61,9 @@ if ((id = shmget(IPC_PRIVATE, sizeof(int), PERM)) == -1) {
  return 1;
  }
 ```
+I also wish I understood better how to do the critical section (through Solution 4).  If I use an extern, I can't dynamically allocate size for the flag array.  So, I guess I must use some sort of shared memory for that so I can dynamically allocate that when I know how processing nodes I'll be needing.
 
+I think I will put that into my main array struct.  Since it's already in Shared Memory, and there is already one for each array node, that would work perfectly (I think).  I'd like to know from Professor Bhatia if that's okay.
 
 ## Work Log
 
@@ -70,5 +72,7 @@ if ((id = shmget(IPC_PRIVATE, sizeof(int), PERM)) == -1) {
 - 2/13/2021 - Finished rough master, memory allocation with shm functions
 - 2/14/2021 - Finished logic to send requests to bin_adder(), added bin_adder code to determine size of shared memory.
 - 2/15/2021 - Debugging functionality
+- 2/16/2021 - Fixes to functionality; Setting up Max Time To Process and Max Children
+- 2/17/2021 - Added signaling functionality to handle Ctrl-C and timeouts; debugging; Started work on critical section
 
 *©2021 Brett W. Huffman*
