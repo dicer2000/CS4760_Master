@@ -325,9 +325,20 @@ int forkProcess(int nItemStart, int nDepth)
         {
             // Increment our ProcessCount
             ProcessCount++;
-            // Get strings from the int params
-            string strItemStart = format("%d", nItemStart);
-            string strDepth = format("%d", nDepth);
+            // Make string version of nItemStart
+            int length = snprintf( NULL, 0, "%d", nItemStart);
+            char* sStart = (char*)malloc( length + 1 );
+            snprintf( sStart, length + 1, "%d", nItemStart );
+            string strItemStart = sStart;
+            free(sStart);
+            
+            // Make string version of nDepth
+            length = snprintf( NULL, 0, "%d", nDepth);
+            char* sDep = (char*)malloc( length + 1 );
+            snprintf( sDep, length + 1, "%d", nDepth );
+            string strDepth = sDep;
+            free(sDep);
+
             // Execute child process
             execl(ChildProcess, strItemStart.c_str(), strDepth.c_str(), NULL);
 

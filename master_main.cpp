@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "master.h"
+#include <errno.h>
 
 // Constants
 const int MaxNumberOfChildren = 20;

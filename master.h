@@ -6,8 +6,7 @@ using namespace std;
 int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, string InputDataFile);
 int forkProcess(int nItemStart, int nDepth);
 
-
-
+/*
 // Missing string printf
 // from: https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
 inline std::string format(const char* fmt, ...){
@@ -28,5 +27,4 @@ inline std::string format(const char* fmt, ...){
     delete[] buffer;
     return ret;
 }
-
-
+*/

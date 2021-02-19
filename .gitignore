@@ -1042,3 +1042,4 @@ dkms.conf
 
 master
 bin_adder
+adder_log
