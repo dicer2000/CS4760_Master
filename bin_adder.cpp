@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
 //    turn = j;
     addItems[nFirstNumberIndex].itemState = idle;
 
-    
+
 
 
 

@@ -161,6 +161,14 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
     pid_t cpid, w;
     int wstatus;
 
+        // Debug Print ***************************
+            for(int j=0; j < arrItemCount; j++)
+                cout << addItems[j].itemValue << "\t";
+            cout << endl;
+        // ****************************************
+
+
+
     // Set a variable to keep track of target level
     int nDepth = targetlevel;
     // Now, start looping until the entire calculation is complete
@@ -189,13 +197,14 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
 
                     // If the current nodes looked at are ready to process and
                     // haven't already been processed for this depth, process them
-                    if(addItems[nCheck1].nodeDepth < i &&
-                        addItems[nCheck1].readyToProcess && addItems[nCheck2].readyToProcess)
+                    if(addItems[nCheck1].nodeDepth < i
+                        && addItems[nCheck1].readyToProcess && addItems[nCheck2].readyToProcess
+                        && addItems[nCheck1].nodeDepth == addItems[nCheck2].nodeDepth)
                     {
                         // Set as processing
                         addItems[nCheck1].readyToProcess = addItems[nCheck2].readyToProcess = false;
                         // Set the depth of it's last process run
-                        addItems[nCheck1].nodeDepth = addItems[nCheck2].nodeDepth = i; //nDepth-i;
+                        addItems[nCheck1].nodeDepth = addItems[nCheck2].nodeDepth = i;
                         
 //                        cout << "Sending: " << nCheck1 << " " << i << endl;
                         // Fork and store pid in each node
@@ -253,6 +262,7 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
                 // Terminate the entire process => Entire tree has processed
                 if(addItems[0].pidAssigned == w && addItems[0].nodeDepth==nDepth)
                 {
+                cout << w << " Finished: " << w << endl;
                     // Print PID Info
                     bComplete = true;
                     break;

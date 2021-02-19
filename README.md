@@ -65,6 +65,8 @@ I also wish I understood better how to do the critical section (through Solution
 
 I think I will put that into my main array struct.  Since it's already in Shared Memory, and there is already one for each array node, that would work perfectly (I think).  I'd like to know from Professor Bhatia if that's okay.
 
+On 2/18 I identified a large problem with my algorithm for tree traversal.  To do it, I loop through all available nodes looking for a target that are powers of 2^depth of that tree node AND they must have both the two nodes to be added open and ready to process.  That worked well when processing was speedy, but interestingly broke when I added the delay in the bin_adder Critical Section.  The problem ended up being that I was not always comparing nodes that were at the same depth of processing.  Once I added that check, that they were in the same depth, everything started working again.
+
 ## Work Log
 
 - 2/10/2021 - Created project, Makefile, this readme file and got it all to compile
@@ -74,5 +76,8 @@ I think I will put that into my main array struct.  Since it's already in Shared
 - 2/15/2021 - Debugging functionality
 - 2/16/2021 - Fixes to functionality; Setting up Max Time To Process and Max Children
 - 2/17/2021 - Added signaling functionality to handle Ctrl-C and timeouts; debugging; Started work on critical section
+- 2/18/2021 - Fixed issues with addition; Fixed issues with critical section; Placed critical section in its own function handler
+- 2/10/2021 - Added file saving to adder; Debugging
+- 2/19/2021 - Started check-off list to make sure all items are covered
 
 *©2021 Brett W. Huffman*

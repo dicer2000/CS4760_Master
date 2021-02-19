@@ -17,6 +17,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <time.h>
+#include <math.h>
 
 // Semiphore union
 union semun {
