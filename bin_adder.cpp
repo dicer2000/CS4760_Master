@@ -12,6 +12,7 @@
 #include "bin_adder.h"
 #include <unistd.h>
 #include "sharedStructures.h"
+#include <fstream>
 
 // SIGQUIT handling
 volatile sig_atomic_t sigQuitFlag = 0;
@@ -19,8 +20,10 @@ void sigQuitHandler(int sig){ // can be called asynchronously
   sigQuitFlag = 1; // set flag
 }
 
-    // Critical Section Turn Flag
-    extern int turn;
+// Critical Section Turn Flag
+extern int turn;
+
+const char* LogFile = "adder_log";
 
 using namespace std;
 
@@ -138,7 +141,20 @@ int main(int argc, char* argv[])
         // Assign turn to self and enter critical section
         turn = nFirstNumberIndex;
 
-//cout << "***Got here " << childPid << endl;
+        // ************ Enter Critical Secion ************
+
+        // Write to log file
+        ofstream ofLogFile (LogFile, ios::app);
+        if (ofLogFile.is_open())
+        {
+            ofLogFile << time(NULL) << "\t"
+                   << childPid   << "\t"
+                   << nFirstNumberIndex << "\t"
+                   << nDepth << endl;
+            ofLogFile.close();
+        }
+
+        // ************ Exit Critical Section ************
 
     // Start Time for time Analysis
     time_t secondsFinish = time(NULL) + 1;   // Finish time
