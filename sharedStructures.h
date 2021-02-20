@@ -11,13 +11,13 @@
  * Master CPP file for project
  ********************************************/
 
-#include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <errno.h>
 #include <signal.h>
 #include <time.h>
 #include <math.h>
+#include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
