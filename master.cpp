@@ -222,9 +222,15 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
                 // then let program shutdown naturally -- that way
                 // memory is deallocated correctly
                 if(sigIntFlag)
+                {
+                    errno = EINTR;
                     perror("Killing processes due to ctrl-c signal");
+                }
                 else
+                {
+                    errno = ETIMEDOUT;
                     perror("Killing processes due to timeout");
+                }
             }
 
 
