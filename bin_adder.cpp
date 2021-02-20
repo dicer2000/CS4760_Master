@@ -138,46 +138,43 @@ int main(int argc, char* argv[])
     } while (!sigQuitFlag && ( j < length ) || 
         ( turn != nFirstNumberIndex && addItems[turn].itemState != idle ));
 
-        // Assign turn to self and enter critical section
-        turn = nFirstNumberIndex;
+    // Assign turn to self and enter critical section
+    turn = nFirstNumberIndex;
 
-        // ************ Enter Critical Secion ************
+    // ************ Enter Critical Secion ************
+    
+    // Print it to perror
+    string strFormattedResult = GetTimeFormatted("Entered Critical Section: ");
+    perror(strFormattedResult.c_str());
 
-        // Write to log file
-        ofstream ofLogFile (LogFile, ios::app);
-        if (ofLogFile.is_open())
-        {
-            ofLogFile << time(NULL) << "\t"
-                   << childPid   << "\t"
-                   << nFirstNumberIndex << "\t"
-                   << nDepth << endl;
-            ofLogFile.close();
-        }
+    // Write to log file
+    ofstream ofLogFile (LogFile, ios::app);
+    if (ofLogFile.is_open())
+    {
+        ofLogFile << time(NULL) << "\t"
+                << childPid   << "\t"
+                << nFirstNumberIndex << "\t"
+                << nDepth << endl;
+        ofLogFile.close();
+    }
 
-        // ************ Exit Critical Section ************
+    // ************ Exit Critical Section ************
 
-    // Start Time for time Analysis
+    // Make a 1-second wait time
     time_t secondsFinish = time(NULL) + 1;   // Finish time
+
+    // Print it to perror
+    strFormattedResult = GetTimeFormatted("Exited Critical Section: ");
+    perror(strFormattedResult.c_str());
 
     // Loop until a SIGQUIT happens or we reach Finish Time
     while(!sigQuitFlag && secondsFinish > time(NULL))
     ;
 
-
-
     // Exit section is removed because we aren't looping in our example
     // we are just exiting the application.
 
-//    j = (turn + 1) % length;
-//    while (addItems[j].itemState == idle)
-//        j = (j + 1) % length;
-    // Assign turn to next waiting process; change own flag to idle
-//    turn = j;
     addItems[nFirstNumberIndex].itemState = idle;
-
-
-
-
 
     return EXIT_SUCCESS;
 }

@@ -52,3 +52,22 @@ char* shm_addr;
 
 const char* HostProcess = "./master";
 const char* ChildProcess = "./bin_adder";
+
+// For time formatting used throughout both programs
+string GetTimeFormatted(const char* prePendString)
+{
+    time_t rawtime;
+    struct tm * timeinfo;
+    char buffer[10];
+    
+    // Get time
+    time (&rawtime);
+    timeinfo = localtime (&rawtime);
+
+    // Format time for HH:MM:SS
+    strftime (buffer,80,"%T",timeinfo);
+
+    string strReturn = prePendString;
+    strReturn.append(buffer);
+    return strReturn;
+}

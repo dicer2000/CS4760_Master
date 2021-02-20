@@ -47,7 +47,6 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
     // Start Time for time Analysis
     time_t secondsStart;
 
-
     // Read in data file
     FILE *fp;
     char *line = NULL;
@@ -56,7 +55,12 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
 
     fp = fopen(InputDataFile.c_str(), "r");
     if (fp == NULL)
+    {
+        // Error - cant open file
+        errno = ENOENT;
+        perror(InputDataFile.c_str());
         exit(EXIT_FAILURE);
+    }
 
     while ((read = getline(&line, &len, fp)) != -1) {
         int i = atoi(line);
