@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     // return error immediately
     try
     {
-        if(argc!=2) throw std::runtime_error("Incorrect Arguements");
+        if(argc!=2) throw std::exception();// ("Incorrect Arguements");
         int index = optind;
         nFirstNumberIndex = atoi(argv[0]);
         nDepth = atoi(argv[1]);
@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
 
     // Exit section is removed because we aren't looping in our example
     // we are just exiting the application.
-    
+
 //    j = (turn + 1) % length;
 //    while (addItems[j].itemState == idle)
 //        j = (j + 1) % length;
