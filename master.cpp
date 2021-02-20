@@ -237,7 +237,17 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
             cout << endl;
         // ****************************************
 
-                cout << w << " Completed: " << time(NULL) << "s " << endl;
+                // Print out the instance terminated
+                // Make string version of PID
+                int length = snprintf( NULL, 0, "%d", w);
+                char* sDep = (char*)malloc( length + 1 );
+                snprintf( sDep, length + 1, "%d", w );
+                string strPID = sDep;
+                free(sDep);
+                // Now add with time component and perror it
+                strPID.append(" Completed: ");
+                string strFormattedResult = GetTimeFormatted(strPID.c_str());
+                perror(strFormattedResult.c_str());
 
                 // When the PID that terminates is of 0 depth and it's 0 index
                 // Terminate the entire process => Entire tree has processed

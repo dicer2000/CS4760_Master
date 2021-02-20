@@ -23,6 +23,9 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
+// Arguement processing
+extern int opterr;
+
 // Semiphore union
 union semun {
     int                 val;

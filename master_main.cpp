@@ -44,10 +44,12 @@ int main(int argc, char* argv[])
     int opt;
     int nNumberOfSeconds = 100; // Default setting
     int nNumberOfChildren = 20; // Default setting
+    char *cvalue = NULL;
 
     // Go through each parameter entered and
     // prepare for processing
-    while ((opt = getopt(argc, argv, "hst")) != -1) {
+    opterr = 0;
+    while ((opt = getopt(argc, argv, "hs:t:")) != -1) {
         switch (opt) {
             case 'h':
                 show_usage(argv[0]);

@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
     ofstream ofLogFile (LogFile, ios::app);
     if (ofLogFile.is_open())
     {
-        ofLogFile << time(NULL) << "\t"
+        ofLogFile << GetTimeFormatted("") << "\t"
                 << childPid   << "\t"
                 << nFirstNumberIndex << "\t"
                 << nDepth << endl;
@@ -163,13 +163,13 @@ int main(int argc, char* argv[])
     // Make a 1-second wait time
     time_t secondsFinish = time(NULL) + 1;   // Finish time
 
-    // Print it to perror
-    strFormattedResult = GetTimeFormatted("Exited Critical Section: ");
-    perror(strFormattedResult.c_str());
-
     // Loop until a SIGQUIT happens or we reach Finish Time
     while(!sigQuitFlag && secondsFinish > time(NULL))
     ;
+
+    // Print it to perror
+    strFormattedResult = GetTimeFormatted("Exited Critical Section: ");
+    perror(strFormattedResult.c_str());
 
     // Exit section is removed because we aren't looping in our example
     // we are just exiting the application.
