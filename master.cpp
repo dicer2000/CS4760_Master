@@ -92,7 +92,7 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
             // Pad Array with zeros
             vecItemArray.push_back(0);
         }
-        while(pow(2, targetlevel) < vecItemArray.size());
+        while(pow(2, targetlevel) > vecItemArray.size());
     }
 
     // If this was successful, we are finally ready to process
@@ -221,6 +221,7 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
                 // We have notified children to terminate immediately
                 // then let program shutdown naturally -- that way
                 // memory is deallocated correctly
+                cout << endl;
                 if(sigIntFlag)
                 {
                     errno = EINTR;
@@ -236,26 +237,25 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
 
             // No PIDs are in-process
             if (waitPID == -1) {
-                // If the first value is not at the final depth
-                // then we just need to start the cycle up again
-//                if(addItems[0].nodeDepth != nDepth)
-//                    break;
-                // Otherwise, the addition is complete.  Show final value
-                // and gracefully shutdown
-                int length = snprintf( NULL, 0, "%d", addItems[0].itemValue);
-                char* sDep = (char*)malloc( length + 1 );
-                snprintf( sDep, length + 1, "%d", addItems[0].itemValue);
-                string strFinalVal = "*** Addition Process Finished: ";
-                strFinalVal.append(sDep);                    
-                free(sDep);
+                // Show finish message only if it's not killed
+                if(!isKilled)
+                {
+                    // Otherwise, the addition is complete.  Show final value
+                    // and gracefully shutdown
+                    int length = snprintf( NULL, 0, "%d", addItems[0].itemValue);
+                    char* sDep = (char*)malloc( length + 1 );
+                    snprintf( sDep, length + 1, "%d", addItems[0].itemValue);
+                    string strFinalVal = "*** Addition Process Finished: ";
+                    strFinalVal.append(sDep);                    
+                    free(sDep);
 
-                // Show success error code
-                errno = 0;
+                    // Show success error code
+                    errno = 0;
 
-                // Show the final value
-                cout << endl;
-                perror(strFinalVal.c_str());
-
+                    // Show the final value
+                    cout << endl;
+                    perror(strFinalVal.c_str());
+                }
                 bComplete = true;   // We say true so that we exit out of main
                 break;              // loop and free up all necessary data
 //                exit(EXIT_FAILURE);
