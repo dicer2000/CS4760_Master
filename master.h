@@ -1,3 +1,11 @@
+/********************************************
+ * master.h - Master include file
+ * 
+ * Brett Huffman
+ * CMP SCI 4760 - Project 2
+ * Due Feb 23, 2021
+ * Master .h file for project
+ ********************************************/
 #include <iostream>
 
 using namespace std;

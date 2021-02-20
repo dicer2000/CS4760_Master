@@ -4,8 +4,8 @@
  * application.  It kicks off from the main file.
  * 
  * Brett Huffman
- * CMP SCI 4760 - Project 1
- * Due Feb 9, 2021
+ * CMP SCI 4760 - Project 2
+ * Due Feb 23, 2021
  * bin_adder CPP file for project
  ********************************************/
 #include <iostream>

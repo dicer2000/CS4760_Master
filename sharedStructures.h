@@ -6,9 +6,9 @@
  * containing data, and semephores.
  * 
  * Brett Huffman
- * CMP SCI 4760 - Project 1
- * Due Feb 9, 2021
- * Master CPP file for project
+ * CMP SCI 4760 - Project 2
+ * Due Feb 23, 2021
+ * sharedStructures .h file for project
  ********************************************/
 
 #include <sys/ipc.h>

@@ -7,8 +7,8 @@
  * processing.
  * 
  * Brett Huffman
- * CMP SCI 4760 - Project 1
- * Due Feb 9, 2021
+ * CMP SCI 4760 - Project 2
+ * Due Feb 23, 2021
  * Main CPP file for project
  ********************************************/
 #include <iostream>
@@ -27,15 +27,6 @@ const int MaxNumberOfSeconds = 100;
 
 // Forward declarations
 static void show_usage(std::string);
-
-namespace F1
-{
-    int main(int argc, char * argv[])
-    {
-        // ...
-        return EXIT_SUCCESS;
-    }
-}
 
 // Main - expecting arguments
 int main(int argc, char* argv[])
