@@ -18,6 +18,9 @@
 #include <signal.h>
 #include <time.h>
 #include <math.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 // Semiphore union
 union semun {

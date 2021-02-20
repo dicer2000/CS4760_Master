@@ -165,7 +165,9 @@ int main(int argc, char* argv[])
 
 
 
-    // Exit section
+    // Exit section is removed because we aren't looping in our example
+    // we are just exiting the application.
+    
 //    j = (turn + 1) % length;
 //    while (addItems[j].itemState == idle)
 //        j = (j + 1) % length;

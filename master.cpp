@@ -24,6 +24,7 @@
 // Static process counter => Never > 20 (1 Parent + 19 Children)
 const int MAX_PROCESSES = 19;
 static int ProcessCount = 0;
+const int BUFFERSIZE = 8192;
 
 using namespace std;
 
@@ -48,46 +49,24 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
     // Start Time for time Analysis
     time_t secondsStart;
 
-    // Read in data file
-    string line;
-    ifstream processFile(InputDataFile);
-    // Open the file and read it in
-    if (processFile.is_open())
-    {
-        // Read each line
-        while (getline(processFile,line))
-        {
-            // Error check
-            try
-            {
-                int i = std::stoi(line);
-                // We've got a good value
-                // Push it to the vector array
-                vecItemArray.push_back(i);
-            }
-            catch (std::invalid_argument const &e)
-            {
-                processFile.close();
-                perror("Bad data file value");
-                return EXIT_FAILURE;
-            }
-            catch (std::out_of_range const &e)
-            {
-                processFile.close();
-                perror("Bad data file value: Integer overflow");
-                return EXIT_FAILURE;
-            }
 
-        }
-        processFile.close();
+    // Read in data file
+    FILE *fp;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    fp = fopen(InputDataFile.c_str(), "r");
+    if (fp == NULL)
+        exit(EXIT_FAILURE);
+
+    while ((read = getline(&line, &len, fp)) != -1) {
+        int i = atoi(line);
+        vecItemArray.push_back(i);  // Place each line in Vec
     }
-    else
-    {
-        // Error - cant open file
-        errno = ENOENT;
-        perror(InputDataFile.c_str());
-        return EXIT_FAILURE;
-    }
+    fclose(fp);
+    free(line);
+
     // Get the time in seconds for our process to make
     // sure we don't exceed the max amount of processing time
     secondsStart = time(NULL);   // Start time
