@@ -42,6 +42,7 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
 {
     // Register SIGINT handling
     signal(SIGINT, sigintHandler);
+    bool isKilled = false;
 
     // Start Time for time Analysis
     time_t secondsStart;
@@ -203,8 +204,10 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
 
             // Terminate the process if CTRL-C is typed
             // or if the max time-to-process has been exceeded
-            if(sigIntFlag || (time(NULL)-secondsStart) > timeInSecondsToTerminate)
+            // but only send out messages to kill once
+            if((sigIntFlag || (time(NULL)-secondsStart) > timeInSecondsToTerminate) && !isKilled)
             {
+                isKilled = true;
                 // Send signal for every child process to terminate
                 for(int i=0;i<arrItemCount;i++)
                 {
@@ -223,7 +226,7 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
             }
 
 
-
+            // No PIDs are in-process, so addition process if complete
             if (waitPID == -1) {
                 // At this point, the addition is complete.  Show final value
                 // and gracefully shutdown
