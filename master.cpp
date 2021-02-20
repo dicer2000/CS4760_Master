@@ -13,7 +13,6 @@
 #include <vector>
 #include <fstream>
 #include <ctype.h>
-#include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
 #include "master.h"
