@@ -56,6 +56,10 @@ char* shm_addr;
 const char* HostProcess = "./master";
 const char* ChildProcess = "./bin_adder";
 
+
+/***************************************************
+ * Helper Functions
+ * *************************************************/
 // For time formatting used throughout both programs
 string GetTimeFormatted(const char* prePendString)
 {
@@ -73,4 +77,15 @@ string GetTimeFormatted(const char* prePendString)
     string strReturn = prePendString;
     strReturn.append(buffer);
     return strReturn;
+}
+
+// Returns a string from an int
+string GetStringFromInt(const int nVal)
+{
+    int length = snprintf( NULL, 0, "%d", nVal);
+    char* sDep = (char*)malloc( length + 1 );
+    snprintf( sDep, length + 1, "%d", nVal);
+    string strFinalVal = sDep;                    
+    free(sDep);
+    return strFinalVal;
 }

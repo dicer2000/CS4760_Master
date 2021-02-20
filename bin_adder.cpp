@@ -63,7 +63,12 @@ int main(int argc, char* argv[])
     nSecondNumberIndex = pow(2, nDepth) + nFirstNumberIndex;
 
     pid_t childPid = getpid();
-    cout << "Adder PID " << childPid << ": " << nFirstNumberIndex << " " << nDepth << endl;
+
+    // Show startup params to perror
+    string strChildPid = GetStringFromInt(childPid);
+    string strShow ="PID: " + strChildPid + " - bin_adder " + 
+        GetStringFromInt(nFirstNumberIndex) + " " + GetStringFromInt(nDepth);
+    perror(strShow.c_str());
 
     // Allocate the shared memory
     // And get ready for read/write

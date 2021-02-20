@@ -139,14 +139,14 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
     bool bComplete = false;
     int status;
     int arrayIndex = 0;
-    pid_t cpid, w;
+    pid_t cpid, waitPID;
     int wstatus;
 
-        // Debug Print ***************************
-            for(int j=0; j < arrItemCount; j++)
-                cout << addItems[j].itemValue << "\t";
-            cout << endl;
-        // ****************************************
+    // *********** Node Print *****************
+        for(int j=0; j < arrItemCount; j++)
+            cout << "\t" << addItems[j].itemValue;
+        cout << endl;
+    // ****************************************
 
 
 
@@ -200,7 +200,7 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
         do {
             // Note :: We use the WNOHANG to call waitpid without blocking
             // If it returns 0, it does not have a PID waiting
-            w = waitpid(-1, &wstatus, WNOHANG | WUNTRACED | WCONTINUED);
+            waitPID = waitpid(-1, &wstatus, WNOHANG | WUNTRACED | WCONTINUED);
 
             // Terminate the process if CTRL-C is typed
             // or if the max time-to-process has been exceeded
@@ -217,31 +217,44 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
                 // We have notified children to terminate immediately
                 // then let program shutdown naturally -- that way
                 // memory is deallocated correctly
+                if(sigIntFlag)
+                    perror("Killing processes due to ctrl-c signal");
+                else
+                    perror("Killing processes due to timeout");
             }
 
 
 
-            if (w == -1) {
-//                perror("waitpid");
+            if (waitPID == -1) {
+                // At this point, the addition is complete.  Show final value
+                // and gracefully shutdown
+                int length = snprintf( NULL, 0, "%d", addItems[0].itemValue);
+                char* sDep = (char*)malloc( length + 1 );
+                snprintf( sDep, length + 1, "%d", addItems[0].itemValue);
+                string strFinalVal = "*** Addition Process Finished: ";
+                strFinalVal.append(sDep);                    
+                free(sDep);
+                // Show the final value
+                perror(strFinalVal.c_str());
+
                 bComplete = true;   // We say true so that we exit out of main
                 break;              // loop and free up all necessary data
 //                exit(EXIT_FAILURE);
             }
 
-            if (WIFEXITED(wstatus) && w > 0) {
+            if (WIFEXITED(wstatus) && waitPID > 0) {
 
-                // Success! Child processed correctly
-        // Debug Print ***************************
-            for(int j=0; j < arrItemCount; j++)
-                cout << addItems[j].itemValue << "\t";
-            cout << endl;
-        // ****************************************
+                // Success! Child processed correctly = Show it
+                for(int j=0; j < arrItemCount; j++)
+                    cout << "\t" << addItems[j].itemValue;
+                cout << endl;
+                // ****************************************
 
                 // Print out the instance terminated
                 // Make string version of PID
-                int length = snprintf( NULL, 0, "%d", w);
+                int length = snprintf( NULL, 0, "%d", waitPID);
                 char* sDep = (char*)malloc( length + 1 );
-                snprintf( sDep, length + 1, "%d", w );
+                snprintf( sDep, length + 1, "%d", waitPID );
                 string strPID = sDep;
                 free(sDep);
                 // Now add with time component and perror it
@@ -251,10 +264,9 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
 
                 // When the PID that terminates is of 0 depth and it's 0 index
                 // Terminate the entire process => Entire tree has processed
-                if(addItems[0].pidAssigned == w && addItems[0].nodeDepth==nDepth)
+                if(addItems[0].pidAssigned == waitPID && addItems[0].nodeDepth==nDepth)
                 {
-                cout << w << " Finished: " << w << endl;
-                    // Print PID Info
+                    // Flag to break down the entire memory structure
                     bComplete = true;
                     break;
                 }
@@ -263,7 +275,7 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
                     // Find the item in the array based on PID
                     for(int i=0;i<arrItemCount;i++)
                     {
-                        if(addItems[i].pidAssigned == w)
+                        if(addItems[i].pidAssigned == waitPID)
                         {
                             // Set this node as ready to process and continue
                             addItems[i].readyToProcess = true;
@@ -271,11 +283,11 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
                         }
                     }
                 }
-            } else if (WIFSIGNALED(wstatus) && w > 0) {
-                cout << w << " killed by signal " << WTERMSIG(wstatus) << endl;
-            } else if (WIFSTOPPED(wstatus) && w > 0) {
-                cout << w << " stopped by signal " << WTERMSIG(wstatus) << endl;
-            } else if (WIFCONTINUED(wstatus) && w > 0) {
+            } else if (WIFSIGNALED(wstatus) && waitPID > 0) {
+                cout << waitPID << " killed by signal " << WTERMSIG(wstatus) << endl;
+            } else if (WIFSTOPPED(wstatus) && waitPID > 0) {
+                cout << waitPID << " stopped by signal " << WTERMSIG(wstatus) << endl;
+            } else if (WIFCONTINUED(wstatus) && waitPID > 0) {
                 continue;
             }
         } while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus));
@@ -285,7 +297,7 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
     }
 
     // Dedetach shared memory segment from process's address space
-    cout << "De-allocating shared memory" << endl;
+    cout << endl << "De-allocating shared memory" << endl;
     if (shmdt(shm_addr) == -1) {
         perror("main: shmdt: ");
     }
