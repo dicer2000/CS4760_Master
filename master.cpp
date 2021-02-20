@@ -158,7 +158,6 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
     // Once everything is done, cleanup and exit
     while(!bComplete)
     {
-
         // Search for an "Ready" node first by depth
         // then by every node in the array
         // Only do this if we are no Stop Flag, no time to terminate,
@@ -168,7 +167,8 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
         {
             for(int i=0;i<nDepth;i++)
             {
-                for(int j=0;j<arrItemCount;j+=pow(2, i+1))
+                for(int j=0;j<arrItemCount && ProcessCount < numberOfChildrenAllowed && ProcessCount < MAX_PROCESSES
+                    ;j+=pow(2, i+1))
                 {
                     // j will always be the nodes we need to
                     // check.  If it is "Ready", check it's 
@@ -187,7 +187,9 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
                         // Set the depth of it's last process run
                         addItems[nCheck1].nodeDepth = addItems[nCheck2].nodeDepth = i;
                         
-//                        cout << "Sending: " << nCheck1 << " " << i << endl;
+                        // Increment our Process Count
+                        ProcessCount++;
+
                         // Fork and store pid in each node
                         int pid = forkProcess(nCheck1, i);
                         addItems[nCheck1].pidAssigned = addItems[nCheck2].pidAssigned = pid;
@@ -226,9 +228,13 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
             }
 
 
-            // No PIDs are in-process, so addition process if complete
+            // No PIDs are in-process
             if (waitPID == -1) {
-                // At this point, the addition is complete.  Show final value
+                // If the first value is not at the final depth
+                // then we just need to start the cycle up again
+//                if(addItems[0].nodeDepth != nDepth)
+//                    break;
+                // Otherwise, the addition is complete.  Show final value
                 // and gracefully shutdown
                 int length = snprintf( NULL, 0, "%d", addItems[0].itemValue);
                 char* sDep = (char*)malloc( length + 1 );
@@ -236,7 +242,12 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
                 string strFinalVal = "*** Addition Process Finished: ";
                 strFinalVal.append(sDep);                    
                 free(sDep);
+
+                // Show success error code
+                errno = 0;
+
                 // Show the final value
+                cout << endl;
                 perror(strFinalVal.c_str());
 
                 bComplete = true;   // We say true so that we exit out of main
@@ -244,7 +255,10 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
 //                exit(EXIT_FAILURE);
             }
 
-            if (WIFEXITED(wstatus) && waitPID > 0) {
+            if (WIFEXITED(wstatus) && waitPID > 0)
+            {
+                // Decrement our ProcessCounter
+                ProcessCount--;
 
                 // Success! Child processed correctly = Show it
                 for(int j=0; j < arrItemCount; j++)
@@ -260,7 +274,7 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
                 string strPID = sDep;
                 free(sDep);
                 // Now add with time component and perror it
-                strPID.append(" Completed: ");
+                strPID.append(" Exited: ");
                 string strFormattedResult = GetTimeFormatted(strPID.c_str());
                 perror(strFormattedResult.c_str());
 
@@ -292,14 +306,12 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
             } else if (WIFCONTINUED(wstatus) && waitPID > 0) {
                 continue;
             }
-        } while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus));
-        
-
-//sleep(2);
+        } while (!WIFEXITED(wstatus) && !WIFSIGNALED(wstatus));        
     }
 
     // Dedetach shared memory segment from process's address space
-    cout << endl << "De-allocating shared memory" << endl;
+    cout << endl;
+    perror("De-allocating shared memory");
     if (shmdt(shm_addr) == -1) {
         perror("main: shmdt: ");
     }
@@ -308,6 +320,9 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
     if (shmctl(shm_id, IPC_RMID, NULL) == -1) {
         perror("main: shmctl: ");
     }
+
+    perror("Shared memory De-allocated");
+    cout << endl;
 
     // Success!
     return EXIT_SUCCESS;
@@ -328,8 +343,6 @@ int forkProcess(int nItemStart, int nDepth)
         // Child process here - Assign out it's work
         if(pid == 0)
         {
-            // Increment our ProcessCount
-            ProcessCount++;
             // Make string version of nItemStart
             int length = snprintf( NULL, 0, "%d", nItemStart);
             char* sStart = (char*)malloc( length + 1 );
@@ -347,8 +360,6 @@ int forkProcess(int nItemStart, int nDepth)
             // Execute child process
             execl(ChildProcess, strItemStart.c_str(), strDepth.c_str(), NULL);
 
-            // Decrement our ProcessCount
-            ProcessCount--;
             fflush(stdout); // Mostly for debugging -> tty wasn't flushing
             exit(EXIT_SUCCESS);    // Exit from forked process successfully
         }

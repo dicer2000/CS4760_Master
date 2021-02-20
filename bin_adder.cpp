@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
 
     // Show startup params to perror
     string strChildPid = GetStringFromInt(childPid);
-    string strShow ="PID: " + strChildPid + " - bin_adder " + 
+    string strShow = strChildPid + " Started - bin_adder " + 
         GetStringFromInt(nFirstNumberIndex) + " " + GetStringFromInt(nDepth);
     perror(strShow.c_str());
 
