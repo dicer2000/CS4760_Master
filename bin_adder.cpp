@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
     // ************ Enter Critical Secion ************
     
     // Print it to perror
-    string strFormattedResult = GetTimeFormatted("Entered Critical Section: ");
+    string strFormattedResult = strChildPid + " " + GetTimeFormatted("Entered Critical Section: ");
     perror(strFormattedResult.c_str());
 
     // Write to log file
@@ -173,7 +173,7 @@ int main(int argc, char* argv[])
     ;
 
     // Print it to perror
-    strFormattedResult = GetTimeFormatted("Exited Critical Section: ");
+    strFormattedResult = strChildPid + " " + GetTimeFormatted("Exited Critical Section: ");
     perror(strFormattedResult.c_str());
 
     // Exit section is removed because we aren't looping in our example

@@ -79,6 +79,7 @@ On 2/18 I identified a large problem with my algorithm for tree traversal.  To d
 - 2/18/2021 - Fixed issues with addition; Fixed issues with critical section; Placed critical section in its own function handler
 - 2/10/2021 - Added file saving to adder; Debugging
 - 2/19/2021 - Started check-off list to make sure all items are covered
-- 2/20/2021 - Cleaned up project and fully tested all functionality; Updated Readme
+- 2/20/2021 - Cleaned up project and fully tested all functionality; Updated Readme; Turned in
+- 2/21/2021 - Formatted output text; Turned in project
 
 *©2021 Brett W. Huffman*
