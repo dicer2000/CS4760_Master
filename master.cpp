@@ -167,11 +167,12 @@ int processMaster(int numberOfChildrenAllowed, int timeInSecondsToTerminate, str
         {
             for(int i=0;i<nDepth;i++)
             {
-                for(int j=0;j<arrItemCount && ProcessCount < numberOfChildrenAllowed && ProcessCount < MAX_PROCESSES
-                    ;j+=pow(2, i+1))
+                for(int j=0;j<arrItemCount && 
+                            ProcessCount < numberOfChildrenAllowed && 
+                            ProcessCount < MAX_PROCESSES;
+                                j+=pow(2, i+1))
                 {
-                    // j will always be the nodes we need to
-                    // check.  If it is "Ready", check it's 
+                    // j will always be the nodes we need to check.  If it is "Ready", check its 
                     // partner.  If it's "Ready" too => send to bin_adder
                     int nCheck1 = j;
                     int nCheck2 = pow(2, i) + j;
